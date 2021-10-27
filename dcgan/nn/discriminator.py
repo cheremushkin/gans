@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 
 
-class ConvTransposeBlock(nn.Module):
+class ConvBlock(nn.Module):
     """
     ConvTranspose2d -> BatchNorm2d -> ReLU
     """
@@ -16,7 +16,7 @@ class ConvTransposeBlock(nn.Module):
                  bias: bool = False):
         super().__init__()
         self.block = nn.Sequential(
-            nn.ConvTranspose2d(
+            nn.Conv2d(
                 in_channels=in_channels,
                 out_channels=out_channels,
                 kernel_size=kernel_size,
@@ -24,19 +24,18 @@ class ConvTransposeBlock(nn.Module):
                 padding=padding,
                 bias=bias),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True)
+            nn.LeakyReLU(0.2, inplace=True)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.block(x)
 
 
-class Generator(nn.Module):
+class Discriminator(nn.Module):
     """
     Generator for GAN
     """
     def __init__(self,
-                 z_size: int,
                  n_features: int,
                  n_layers: int,
                  n_channels: int):
@@ -48,29 +47,22 @@ class Generator(nn.Module):
         """
         super().__init__()
 
-        in_channels: int = z_size
-        out_channels: int = n_features * (n_layers ** 2)
-        self.blocks: nn.ModuleList = nn.ModuleList([
-            ConvTransposeBlock(in_channels=in_channels,
-                               out_channels=out_channels,
-                               stride=1,
-                               padding=0)
-        ])
-        in_channels = out_channels
-        for n_layer in reversed(range(1, n_layers - 1)):
+        self.blocks: nn.ModuleList = nn.ModuleList()
+        in_channels = n_channels
+        for n_layer in range(n_layers):
             out_channels = n_features * (2 ** n_layer)
-            self.blocks.append(ConvTransposeBlock(in_channels=in_channels, out_channels=out_channels))
+            self.blocks.append(ConvBlock(in_channels=in_channels, out_channels=out_channels))
             in_channels = out_channels
 
-        self.activation: nn.Sequential = nn.Sequential(
-            nn.ConvTranspose2d(
-                in_channels=n_features,
-                out_channels=n_channels,
+        self.activation = nn.Sequential(
+            nn.Conv2d(
+                in_channels=in_channels,
+                out_channels=1,
                 kernel_size=(4, 4),
                 stride=2,
                 padding=1,
                 bias=False),
-            nn.Tanh()
+            nn.Sigmoid()
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
