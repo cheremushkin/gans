@@ -47,7 +47,7 @@ class Discriminator(nn.Module):
         """
         super().__init__()
 
-        self.blocks: nn.ModuleList = nn.ModuleList()
+        self.blocks = nn.ModuleList()
         in_channels = n_channels
         for n_layer in range(n_layers):
             out_channels = n_features * (2 ** n_layer)
