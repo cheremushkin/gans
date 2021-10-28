@@ -59,8 +59,8 @@ class Discriminator(nn.Module):
                 in_channels=in_channels,
                 out_channels=1,
                 kernel_size=(4, 4),
-                stride=2,
-                padding=1,
+                stride=1,
+                padding=0,
                 bias=False),
             nn.Sigmoid()
         )

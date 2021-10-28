@@ -57,7 +57,7 @@ class Generator(nn.Module):
                                padding=0)
         ])
         in_channels = out_channels
-        for n_layer in reversed(range(1, n_layers - 1)):
+        for n_layer in reversed(range(n_layers - 1)):
             out_channels = n_features * (2 ** n_layer)
             self.blocks.append(ConvTransposeBlock(in_channels=in_channels, out_channels=out_channels))
             in_channels = out_channels
