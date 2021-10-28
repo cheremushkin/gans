@@ -48,9 +48,9 @@ class Generator(nn.Module):
         """
         super().__init__()
 
-        in_channels: int = z_size
-        out_channels: int = n_features * (n_layers ** 2)
-        self.blocks: nn.ModuleList = nn.ModuleList([
+        in_channels = z_size
+        out_channels = n_features * (n_layers ** 2)
+        self.blocks = nn.ModuleList([
             ConvTransposeBlock(in_channels=in_channels,
                                out_channels=out_channels,
                                stride=1,
@@ -62,7 +62,7 @@ class Generator(nn.Module):
             self.blocks.append(ConvTransposeBlock(in_channels=in_channels, out_channels=out_channels))
             in_channels = out_channels
 
-        self.activation: nn.Sequential = nn.Sequential(
+        self.activation = nn.Sequential(
             nn.ConvTranspose2d(
                 in_channels=n_features,
                 out_channels=n_channels,
